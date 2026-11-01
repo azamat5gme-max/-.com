@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Аргументы для папы</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  /* Layout: full-screen pinned 3D scene driven by scroll (MacBook, then AirPods Max, then both), followed by a self-typing VS Code window, a cost calculator, a deal checklist and the final question. Cyrillic-capable fonts only. */
+  --bg:#0a0f1c;
+  --bg-a:#0a0f1ccc;
+  --bg-b:#0a0f1c00;
+  --surface:#121a2c;
+  --surface-2:#18223a;
+  --line:#26324d;
+  --fg:#eaf0fb;
+  --muted:#93a0ba;
+  --accent:#6fb7ff;
+  --warm:#ffb86b;
+  --ink:#08101f;
+  --display:"Unbounded","Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background-color:var(--bg);color:var(--fg);font:16px/1.6 var(--body)}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--warm);outline-offset:3px}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.inner{max-width:1080px;margin:0 auto}
+.band{padding-block:84px 0}
+.band:last-of-type{padding-bottom:84px}
+
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.06;font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2.3rem);line-height:1.14;font-weight:700;letter-spacing:-.015em}
+h1 em,h2 em{font-style:normal;color:var(--warm)}
+.eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 14px}
+.sec-intro{color:var(--muted);max-width:56ch;margin:14px 0 0}
+.btn{
+  font:700 1rem var(--body);border-radius:999px;padding:13px 26px;border:2px solid var(--line);
+  background:transparent;color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block;
+  transition:transform .15s,background .15s,border-color .15s;
+}
+.btn:hover{border-color:var(--accent)}
+.btn-yes{background:var(--warm);border-color:var(--warm);color:var(--ink)}
+.btn-yes:hover{background:#ffc98d;border-color:#ffc98d;transform:translateY(-2px)}
+
+/* top bar */
+.top{
+  position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-bottom:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:linear-gradient(var(--bg-a),var(--bg-b));
+}
+.brand{font:700 .92rem var(--display);letter-spacing:-.01em;text-decoration:none;color:var(--fg)}
+.top .btn{padding:8px 16px;font-size:.86rem;border-width:1.5px}
+.bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--warm);transform:scaleX(0);transform-origin:left}
+
+/* pinned scene */
+.scene{position:relative;height:520vh;height:520svh}
+.pin{
+  position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  background:radial-gradient(55% 60% at 70% 45%,#1d3d78 0%,#0f1a33 55%,#0a0f1c 100%);
+}
+.pin canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pin.nogl canvas{display:none}
+.copy-wrap{position:relative;z-index:2;height:100%;display:grid;align-content:center;pointer-events:none}
+.copies{display:grid;max-width:min(31rem,46%)}
+.copy{grid-area:1/1;opacity:0;visibility:hidden;will-change:opacity,transform}
+.copy:first-child{opacity:1;visibility:visible}
+.copy p{color:var(--muted);font-size:1.1rem;margin:20px 0 0;max-width:42ch}
+.copy .eyebrow{color:var(--accent);font-size:.78rem;margin:0 0 14px;max-width:none}
+.pts{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:10px}
+.pts li{display:flex;gap:12px;align-items:baseline}
+.pts li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warm);flex:none;transform:translateY(-1px)}
+.hint{position:absolute;z-index:3;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;pointer-events:none}
+.hint span{display:inline-flex;align-items:center;gap:10px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hint i{width:2px;height:26px;background:linear-gradient(var(--accent),transparent);display:block;animation:drip 1.6s ease-in-out infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0)}60%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+.pin-fade{position:absolute;inset:0;z-index:1;pointer-events:none;display:none;background:linear-gradient(to top,var(--bg) 0%,#0a0f1ccc 30%,transparent 62%)}
+
+/* VS Code window */
+.vsc{border-radius:14px;overflow:hidden;border:1px solid #000;background:#1e1e1e;box-shadow:0 40px 90px -30px #000d;margin-top:34px;font:13px/1.5 system-ui,sans-serif}
+.vsc-title{background:#323233;height:36px;display:flex;align-items:center;gap:12px;padding:0 12px;color:#9d9d9d;font-size:12px}
+.dots{display:flex;gap:7px;flex:none}
+.dots i{width:12px;height:12px;border-radius:50%;background:#ff5f57;display:block}
+.dots i:nth-child(2){background:#febc2e}
+.dots i:nth-child(3){background:#28c840}
+.vsc-name{flex:1;min-width:0;text-align:center;margin-right:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsc-body{display:grid;grid-template-columns:46px 200px minmax(0,1fr)}
+.act{background:#333333;display:flex;flex-direction:column;align-items:center;gap:20px;padding-top:16px}
+.act i{width:20px;height:20px;border:2px solid #858585;border-radius:5px;display:block;opacity:.75}
+.act i:first-child{border-color:#fff;opacity:1}
+.side{background:#252526;color:#cccccc;font-size:12px;padding:8px 0;min-width:0}
+.side h4{margin:0;font-size:11px;letter-spacing:.08em;font-weight:500;color:#bbbbbb;padding:6px 16px}
+.side h5{margin:4px 0;font-size:11px;font-weight:700;padding:2px 12px;color:#e7e7e7}
+.file{padding:3px 16px 3px 28px;display:flex;gap:8px;align-items:center;white-space:nowrap}
+.file.on{background:#37373d;color:#fff}
+.file b{font:700 8px/1 var(--mono);color:#1e1e1e;background:#f1e05a;border-radius:2px;padding:2px 3px}
+.file b.md{background:#519aba;color:#fff}
+.file b.js{background:#cbcb41}
+.main{min-width:0;display:flex;flex-direction:column}
+.tabs{display:flex;background:#252526;overflow:hidden}
+.tab{padding:9px 16px;font-size:12.5px;color:#969696;background:#2d2d2d;border-right:1px solid #252526;white-space:nowrap}
+.tab.on{background:#1e1e1e;color:#fff;box-shadow:inset 0 1px 0 #007acc}
+.crumb{padding:5px 16px;font-size:12px;color:#9d9d9d;background:#1e1e1e}
+.editor{display:grid;grid-template-columns:auto minmax(0,1fr);height:392px;overflow:auto;background:#1e1e1e}
+.gutter{position:sticky;left:0;background:#1e1e1e;padding:8px 14px 8px 16px;text-align:right;color:#858585;font:13.5px/22px var(--mono);white-space:pre;user-select:none}
+.code{margin:0;padding:8px 18px 8px 4px;font:13.5px/22px var(--mono);color:#d4d4d4;white-space:pre;min-width:0}
+.c-com{color:#6a9955}.c-str{color:#ce9178}.c-kw{color:#569cd6}.c-num{color:#b5cea8}.c-fn{color:#dcdcaa}.c-var{color:#9cdcfe}
+.caret{display:inline-block;width:2px;height:1.2em;background:#aeafad;vertical-align:text-bottom;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term{border-top:1px solid #3c3c3c;background:#1e1e1e;font:13px/1.65 var(--mono);color:#cccccc;padding:0 16px 14px;min-height:142px}
+.term-h{font:500 11px system-ui,sans-serif;letter-spacing:.08em;color:#e7e7e7;padding:7px 0 6px;margin-bottom:8px;border-bottom:1px solid #2f2f2f}
+.tp{color:#6a9955}
+.ok{color:#4ec9b0}
+.vsc-status{background:#007acc;color:#fff;font-size:12px;display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:4px 12px}
+.vsc-foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:22px;min-height:52px}
+.vsc-foot p{margin:0;color:var(--muted)}
+
+/* calculator */
+.calc{background:var(--surface-2);border:1px solid var(--line);border-radius:26px;padding:clamp(22px,4vw,38px);margin-top:32px;display:grid;gap:28px}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.fields > *,.results > *{min-width:0}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:8px;letter-spacing:.02em}
+.field input[type=number]{
+  width:100%;font:500 1.15rem var(--body);color:var(--fg);background:var(--bg);border:1px solid var(--line);
+  border-radius:14px;padding:12px 14px;font-variant-numeric:tabular-nums;
+}
+.field input[type=range]{width:100%;accent-color:var(--warm);height:44px;margin:0}
+.years-out{font-weight:700;color:var(--fg)}
+.results{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.res{border-top:2px solid var(--line);padding-top:14px}
+.res .num{font:700 clamp(1.6rem,3.6vw,2.4rem)/1.1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.res .num.hot{color:var(--warm)}
+.res .cap{font-size:.86rem;color:var(--muted);margin-top:8px}
+.fine{font-size:.82rem;color:var(--muted);margin:0}
+
+/* deal */
+.deal{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:10px;max-width:680px}
+.deal label{display:flex;gap:14px;align-items:center;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;cursor:pointer;min-height:56px;transition:border-color .15s}
+.deal label:hover{border-color:var(--accent)}
+.deal input{width:22px;height:22px;accent-color:var(--warm);flex:none;margin:0}
+.deal input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warm)}
+.deal-count{margin:16px 0 0;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* answer */
+.answer{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:clamp(26px,5vw,56px)}
+.answer h2{max-width:16ch}
+.zone{position:relative;display:flex;flex-wrap:wrap;gap:14px;align-items:center;min-height:150px;margin-top:20px}
+.zone .btn-no{transition:transform .28s cubic-bezier(.3,1.6,.5,1),border-color .15s}
+.thanks{margin:8px 0 0;font:700 clamp(1.3rem,3.4vw,2rem)/1.2 var(--display);color:var(--warm);max-width:20ch}
+.credit{padding-bottom:48px;color:var(--muted);font-size:.8rem}
+.credit p{margin:0 0 6px;max-width:80ch}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.loading{position:absolute;z-index:3;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));font-size:.78rem;letter-spacing:.06em;color:var(--muted)}
+.pin.nogl .loading{display:none}
+.credit a{overflow-wrap:anywhere}
+.pc-stage{position:relative;margin-top:30px;height:clamp(340px,56vw,560px);border-radius:28px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(60% 70% at 50% 45%,#1d3d78 0%,#0f1a33 60%,#0a0f1c 100%)}
+.pc-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.pc-stage canvas:active{cursor:grabbing}
+.pc-note,.pc-hint{position:absolute;font-size:.78rem;letter-spacing:.06em;color:var(--muted);pointer-events:none}
+.pc-note{left:18px;top:16px}
+.pc-hint{right:18px;bottom:14px}
+
+@media (max-width:820px){
+  .copies{max-width:none}
+  .copy-wrap{align-content:end;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .pin-fade{display:block}
+  .copy p{font-size:1rem;margin-top:12px}
+  .pts{margin-top:14px;gap:6px;font-size:.95rem}
+  h1{font-size:clamp(1.8rem,8.4vw,2.5rem)}
+  .copy h2{font-size:clamp(1.5rem,6.6vw,2rem)}
+  .vsc-body{grid-template-columns:minmax(0,1fr)}
+  .act,.side{display:none}
+  .editor{height:340px}
+  .code,.gutter{font-size:12.5px}
+  .fields,.results{grid-template-columns:1fr}
+  .band{padding-top:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn,.zone .btn-no,.hint i{transition:none;animation:none}
+  .caret{animation:none}
+}
+</style>
+
+<header class="top">
+  <a class="brand" href="#scene">Аргументы для папы</a>
+  <a class="btn" href="#answer">К моему вопросу</a>
+  <div class="bar" id="bar"></div>
+</header>
+
+<main>
+  <section class="scene" id="scene">
+    <div class="pin" id="pin">
+      <canvas id="gl" role="img" aria-label="3D MacBook и AirPods Max, которые двигаются при прокрутке"></canvas>
+      <div class="pin-fade"></div>
+      <div class="copy-wrap gut">
+        <div class="inner" style="width:100%">
+          <div class="copies">
+            <div class="copy" id="cA">
+              <p class="eyebrow">Ноутбук</p>
+              <h1>Папа, <em>выслушай</em> меня.</h1>
+              <p>Смотри, как он открывается. Это MacBook, который мне нужен для учёбы, и вот почему.</p>
+              <ul class="pts">
+                <li>Быстро включается и не зависает</li>
+                <li>Заряда хватает на весь учебный день</li>
+                <li>Тянет программирование и монтаж видео</li>
+                <li>Его можно взять с собой и учиться не только дома</li>
+              </ul>
+            </div>
+            <div class="copy" id="cB">
+              <p class="eyebrow">Наушники</p>
+              <h2>И ещё <em>AirPods Max.</em></h2>
+              <p>Тишина для домашки и удобство на длинных онлайн-уроках.</p>
+              <ul class="pts">
+                <li>Шумоподавление отсекает всё вокруг</li>
+                <li>Мягкие амбушюры, в них удобно часами</li>
+                <li>Сами переключаются на MacBook</li>
+              </ul>
+            </div>
+            <div class="copy" id="cC">
+              <p class="eyebrow">Вместе</p>
+              <h2>Всё моё рабочее место.</h2>
+              <p>Листай дальше. У меня есть ещё одна просьба, а потом покажу, что буду делать на этом.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hint gut" id="hint"><div class="inner" style="width:100%"><span><i></i>Листай</span></div></div>
+      <div class="loading" id="loading" aria-live="polite">Загружаю 3D-модель…</div>
+    </div>
+  </section>
+
+  <section class="band" id="pc">
+    <div class="inner gut">
+      <p class="eyebrow">Ещё одна просьба</p>
+      <h2>Папа, помоги <em>починить мой компьютер.</em></h2>
+      <p class="sec-intro">Вот он. Он стоит дома, поэтому работать на нём я могу только дома. Ноутбук нужен, чтобы учиться и делать проекты и в школе, и в библиотеке, и у друзей. А этот компьютер всё равно нужно починить. Покрути его и скажи, что поможешь.</p>
+      <div class="pc-stage" id="pcStage">
+        <canvas id="glPc" role="img" aria-label="3D-модель моего компьютера, которую можно вращать"></canvas>
+        <div class="pc-note" id="pcNote">Загружаю 3D-модель…</div>
+        <div class="pc-hint">Тяни, чтобы повернуть</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="code">
+    <div class="inner gut">
+      <p class="eyebrow">Что я буду делать</p>
+      <h2>Смотри, как я пишу <em>свою первую программу.</em></h2>
+      <p class="sec-intro">Она печатается сама. Именно этому я хочу научиться на MacBook.</p>
+
+      <div class="vsc" id="vsc">
+        <div class="vsc-title">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="vsc-name">why.js - my-first-project - Visual Studio Code</span>
+        </div>
+        <div class="vsc-body">
+          <nav class="act" aria-hidden="true"><i></i><i></i><i></i><i></i></nav>
+          <aside class="side" aria-hidden="true">
+            <h4>EXPLORER</h4>
+            <h5>MY-FIRST-PROJECT</h5>
+            <div class="file on"><b class="js">JS</b>why.js</div>
+            <div class="file"><b class="md">MD</b>README.md</div>
+            <div class="file"><b>{}</b>package.json</div>
+          </aside>
+          <div class="main">
+            <div class="tabs" aria-hidden="true"><div class="tab on">why.js</div><div class="tab">README.md</div></div>
+            <div class="crumb" aria-hidden="true">my-first-project &gt; why.js</div>
+            <div class="editor" id="editor">
+              <div class="gutter" id="gut" aria-hidden="true">1</div>
+              <pre class="code" id="codeEl" aria-label="Код, который печатается сам: небольшая программа на JavaScript"></pre>
+            </div>
+            <div class="term" aria-live="polite">
+              <div class="term-h">TERMINAL</div>
+              <div id="term"></div>
+            </div>
+          </div>
+        </div>
+        <div class="vsc-status"><span>main &nbsp; 0 errors</span><span id="pos">Ln 1, Col 1 &nbsp;&nbsp; Spaces: 2 &nbsp;&nbsp; UTF-8 &nbsp;&nbsp; JavaScript</span></div>
+      </div>
+      <div class="vsc-foot">
+        <button class="btn" id="replay" type="button" hidden>Смотреть ещё раз</button>
+        <p>Дальше: сколько это стоит в день.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="cost">
+    <div class="inner gut">
+      <p class="eyebrow">Цифры</p>
+      <h2>Сколько это стоит в день.</h2>
+      <p class="sec-intro">Раскидаем цену на годы, которыми я реально буду пользоваться. Поменяй цены на настоящие из магазина.</p>
+      <div class="calc">
+        <div class="fields">
+          <div class="field">
+            <label for="mbPrice">Цена MacBook (в долларах, пример)</label>
+            <input id="mbPrice" type="number" min="0" step="10" value="999" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="apPrice">Цена AirPods Max (в долларах, пример)</label>
+            <input id="apPrice" type="number" min="0" step="10" value="549" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="years">Сколько лет буду пользоваться: <span class="years-out" id="yearsOut">5</span></label>
+            <input id="years" type="range" min="1" max="8" step="1" value="5">
+          </div>
+        </div>
+        <div class="results" aria-live="polite">
+          <div class="res"><div class="num" id="rMb">$0.55</div><div class="cap">MacBook в день</div></div>
+          <div class="res"><div class="num" id="rAp">$0.30</div><div class="cap">AirPods Max в день</div></div>
+          <div class="res"><div class="num hot" id="rAll">$0.85</div><div class="cap" id="rCap">Вместе в день</div></div>
+        </div>
+        <p class="fine">Цены выше являются примерами. Замени их на цены из вашего магазина.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="deal">
+    <div class="inner gut">
+      <p class="eyebrow">Моя часть договора</p>
+      <h2>Что я обещаю взамен.</h2>
+      <p class="sec-intro">Отметь то, с чем согласен, папа.</p>
+      <ul class="deal" id="dealList">
+        <li><label><input type="checkbox"><span>Я держу оценки на хорошем уровне в этой четверти.</span></label></li>
+        <li><label><input type="checkbox"><span>Сначала уроки, потом развлечения.</span></label></li>
+        <li><label><input type="checkbox"><span>Куплю чехол и кейс и буду беречь обе вещи.</span></label></li>
+        <li><label><input type="checkbox"><span>Помогаю по дому без напоминаний.</span></label></li>
+        <li><label><input type="checkbox"><span>AirPods Max лежат в кейсе, когда я ими не пользуюсь.</span></label></li>
+      </ul>
+      <p class="deal-count" id="dealCount">0 из 5 согласовано</p>
+    </div>
+  </section>
+
+  <section class="band" id="answer">
+    <div class="inner gut">
+      <div class="answer">
+        <p class="eyebrow">Вопрос</p>
+        <h2>Ну что, папа, что скажешь?</h2>
+        <div class="zone" id="zone">
+          <button class="btn btn-yes" id="yes" type="button">Да, папа!</button>
+          <button class="btn btn-no" id="no" type="button">Дай подумать</button>
+        </div>
+        <p class="thanks" id="thanks" hidden>Спасибо, папа. Ты лучший.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+<footer class="credit gut">
+  <div class="inner">
+    <p>3D-модели изменены: упрощены и упакованы в один файл, у MacBook анимирована крышка и заменена картинка на экране. Сайт некоммерческий.</p>
+    <p>This work is based on "<a href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2024-8e34fc2b303144f78490007d91ff57c4" target="_blank" rel="noopener">macbook pro M3 16 inch 2024</a>" by <a href="https://sketchfab.com/jackbaeten" target="_blank" rel="noopener">jackbaeten</a> licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a>.</p>
+    <p>This work is based on "<a href="https://sketchfab.com/3d-models/airpods-max-5656bcc0034c4f3bb86e30cae0a0a596" target="_blank" rel="noopener">AirPods Max</a>" by <a href="https://sketchfab.com/Bernardofer" target="_blank" rel="noopener">Bernardo Ferreira Baptista</a> licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a>.</p>
+    <p>This work is based on "<a href="https://sketchfab.com/3d-models/custom-gaming-pc-1a24273417534f69afa0f7c62b643ffc" target="_blank" rel="noopener">Custom Gaming PC</a>" by <a href="https://sketchfab.com/Yolala1232" target="_blank" rel="noopener">Yolala1232</a> licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a>.</p>
+  </div>
+</footer>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clamp01(x){ return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function range(x, a, b){ return clamp01((x - a) / (b - a)); }
+  function ss(t){ return t * t * (3 - 2 * t); }
+  function eo(t){ return 1 - Math.pow(1 - t, 3); }
+
+  /* ================= calculator ================= */
+  var mb = document.getElementById('mbPrice'), ap = document.getElementById('apPrice'), yr = document.getElementById('years');
+  function money(v){ return '$' + (isFinite(v) ? v.toFixed(2) : '0.00'); }
+  function yrs(n){ return n === 1 ? 'год' : n < 5 ? 'года' : 'лет'; }
+  function calc(){
+    var y = +yr.value, days = y * 365;
+    var a = Math.max(0, +mb.value || 0), b = Math.max(0, +ap.value || 0);
+    document.getElementById('yearsOut').textContent = y;
+    document.getElementById('rMb').textContent = money(a / days);
+    document.getElementById('rAp').textContent = money(b / days);
+    document.getElementById('rAll').textContent = money((a + b) / days);
+    document.getElementById('rCap').textContent = 'Вместе в день, за ' + y + ' ' + yrs(y);
+  }
+  [mb, ap, yr].forEach(function(el){ el.addEventListener('input', calc); });
+  calc();
+
+  /* ================= deal checklist ================= */
+  var boxes = document.querySelectorAll('#dealList input');
+  function countDeal(){
+    var n = 0; boxes.forEach(function(b){ if (b.checked) n++; });
+    document.getElementById('dealCount').textContent = n + ' из ' + boxes.length + ' согласовано' + (n === boxes.length ? '. Договорились!' : '');
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', countDeal); });
+
+  /* ================= answer buttons ================= */
+  var yes = document.getElementById('yes'), no = document.getElementById('no'), zone = document.getElementById('zone');
+  var dodges = 0;
+  var labels = ['Не так быстро', 'Ты уверен?', 'Подумай об оценках', 'Последний шанс сказать да', 'Ладно, да'];
+  function dodge(){
+    if (dodges >= labels.length) return;
+    dodges++;
+    no.textContent = labels[dodges - 1];
+    if (dodges === labels.length) { no.style.transform = ''; no.dataset.yes = '1'; return; }
+    var rx = Math.min(130, zone.clientWidth / 4), ry = 46;
+    no.style.transform = 'translate(' + ((Math.random() * 2 - 1) * rx).toFixed(0) + 'px,' + ((Math.random() * 2 - 1) * ry).toFixed(0) + 'px)';
+  }
+  no.addEventListener('pointerenter', function(){ if (!no.dataset.yes) dodge(); });
+  no.addEventListener('click', function(){ if (no.dataset.yes) sayYes(); else dodge(); });
+  yes.addEventListener('click', sayYes);
+  function sayYes(){
+    document.getElementById('thanks').hidden = false;
+    no.hidden = true;
+    confetti();
+  }
+  function confetti(){
+    if (reduce) return;
+    var c = document.getElementById('confetti'), ctx = c.getContext('2d');
+    c.width = innerWidth; c.height = innerHeight;
+    var cols = ['#ffb86b', '#6fb7ff', '#eaf0fb', '#ff7a90', '#9d8cff'], ps = [];
+    for (var i = 0; i < 170; i++) ps.push({
+      x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5,
+      w: 6 + Math.random() * 8, h: 8 + Math.random() * 10, vy: 2 + Math.random() * 4, vx: (Math.random() - .5) * 3,
+      r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[i % cols.length]
+    });
+    var start = performance.now();
+    (function tick(now){
+      ctx.clearRect(0, 0, c.width, c.height);
+      ps.forEach(function(p){
+        p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+      });
+      if (now - start < 4200) requestAnimationFrame(tick); else ctx.clearRect(0, 0, c.width, c.height);
+    })(start);
+  }
+
+  /* ================= VS Code typing ================= */
+  var SRC = [
+    '// why.js',
+    '// Папа, вот что я напишу.',
+    'const goal = "научиться программировать";',
+    'const macbook = { speed: "быстрый" };',
+    'const airpods = { noise: "выкл" };',
+    '',
+    'const price = 999 + 549;',
+    'const days = 5 * 365;',
+    '',
+    'function perDay() {',
+    '  return (price / days).toFixed(2);',
+    '}',
+    '',
+    'function askDad(answer) {',
+    '  console.log("Цель: " + goal);',
+    '  console.log("В день: $" + perDay());',
+    '  console.log("Папа говорит: " + answer);',
+    '}',
+    '',
+    'askDad("да");'
+  ].join('\n');
+  var TOTAL = SRC.length;
+  var segs = [], re = /(\/\/[^\n]*)|("[^"\n]*")|(\b(?:const|function|return)\b)|(\b\d+\b)|([A-Za-z_]\w*(?=\())|([A-Za-z_]\w*)|(\s+|[\s\S])/g;
+  var cls = [null, 'c-com', 'c-str', 'c-kw', 'c-num', 'c-fn', 'c-var', null], m;
+  while ((m = re.exec(SRC))) { for (var k = 1; k <= 7; k++) if (m[k] !== undefined) { segs.push({ t: m[k], c: cls[k] }); break; } }
+
+  var codeEl = document.getElementById('codeEl'), gut = document.getElementById('gut'), editor = document.getElementById('editor');
+  var term = document.getElementById('term'), replay = document.getElementById('replay'), pos = document.getElementById('pos');
+  function esc(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var lastLines = 0;
+  function render(n){
+    var html = '', used = 0;
+    for (var i = 0; i < segs.length && used < n; i++) {
+      var s = segs[i], take = Math.min(s.t.length, n - used), txt = esc(s.t.slice(0, take));
+      html += s.c ? '<span class="' + s.c + '">' + txt + '</span>' : txt;
+      used += take;
+    }
+    codeEl.innerHTML = html + '<span class="caret"></span>';
+    var lines = SRC.slice(0, n).split('\n');
+    if (lines.length !== lastLines) {
+      lastLines = lines.length;
+      var g = []; for (var j = 1; j <= lines.length; j++) g.push(j);
+      gut.textContent = g.join('\n');
+    }
+    pos.innerHTML = 'Ln ' + lines.length + ', Col ' + (lines[lines.length - 1].length + 1) + ' &nbsp;&nbsp; Spaces: 2 &nbsp;&nbsp; UTF-8 &nbsp;&nbsp; JavaScript';
+    editor.scrollTop = editor.scrollHeight;
+  }
+  var OUT = ['Цель: научиться программировать', 'В день: $0.85', 'Папа говорит: да'];
+  var timer = null, runId = 0;
+  function showTermFinal(){
+    term.innerHTML = '<div><span class="tp">$</span> node why.js</div>';
+    OUT.forEach(function(t, i){ var d = document.createElement('div'); d.textContent = t; if (i === OUT.length - 1) d.className = 'ok'; term.appendChild(d); });
+  }
+  function runTerm(id){
+    var cmd = 'node why.js', i = 0;
+    term.innerHTML = '<div><span class="tp">$</span> <span id="tc"></span><span class="caret"></span></div>';
+    var tc = document.getElementById('tc');
+    (function typeCmd(){
+      if (id !== runId) return;
+      if (i < cmd.length) { tc.textContent += cmd.charAt(i++); timer = setTimeout(typeCmd, 45); return; }
+      var cr = term.querySelector('.caret'); if (cr) cr.remove();
+      var j = 0;
+      (function line(){
+        if (id !== runId) return;
+        if (j < OUT.length) {
+          var d = document.createElement('div'); d.textContent = OUT[j];
+          if (j === OUT.length - 1) d.className = 'ok';
+          term.appendChild(d); j++; timer = setTimeout(line, 420);
+        } else replay.hidden = false;
+      })();
+    })();
+  }
+  function startTyping(){
+    runId++; var id = runId, n = 0;
+    clearTimeout(timer); term.innerHTML = ''; replay.hidden = true; lastLines = 0;
+    if (reduce) { render(TOTAL); showTermFinal(); replay.hidden = false; return; }
+    render(0);
+    (function step(){
+      if (id !== runId) return;
+      n++; render(n);
+      if (n >= TOTAL) { timer = setTimeout(function(){ runTerm(id); }, 700); return; }
+      var ch = SRC.charAt(n - 1);
+      timer = setTimeout(step, ch === '\n' ? 150 + Math.random() * 120 : ch === ' ' ? 20 : 18 + Math.random() * 32);
+    })();
+  }
+  render(0);
+  replay.addEventListener('click', startTyping);
+  var started = false;
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function(en, ob){
+      if (en[0].isIntersecting && !started) { started = true; startTyping(); ob.disconnect(); }
+    }, { threshold: 0.45 }).observe(document.getElementById('vsc'));
+  } else { started = true; startTyping(); }
+
+  /* ================= scroll copy ================= */
+  var scene = document.getElementById('scene'), pin = document.getElementById('pin');
+  var cA = document.getElementById('cA'), cB = document.getElementById('cB'), cC = document.getElementById('cC');
+  var hint = document.getElementById('hint'), bar = document.getElementById('bar');
+  function setCopy(el, o, dy){
+    el.style.opacity = o.toFixed(3);
+    el.style.transform = 'translateY(' + dy.toFixed(1) + 'px)';
+    el.style.visibility = o < 0.02 ? 'hidden' : 'visible';
+  }
+  function updateCopy(s, introDone){
+    var a = range(s, 0.2, 0.28);
+    setCopy(cA, 1 - ss(a), -24 * a);
+    var bIn = range(s, 0.3, 0.4), bOut = range(s, 0.66, 0.74);
+    setCopy(cB, ss(bIn) * (1 - ss(bOut)), 24 * (1 - bIn) - 24 * bOut);
+    var cIn = range(s, 0.82, 0.9);
+    setCopy(cC, ss(cIn), 24 * (1 - cIn));
+    hint.style.opacity = introDone ? (1 - range(s, 0, 0.04)).toFixed(2) : 0;
+  }
+  function sceneProgress(){
+    var r = scene.getBoundingClientRect(), span = r.height - pin.clientHeight;
+    return span > 0 ? clamp01(-r.top / span) : 0;
+  }
+
+  /* ================= 3D ================= */
+  var cv = document.getElementById('gl'), renderer = null;
+  try {
+    if (!window.THREE) throw new Error('no three');
+    renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+  } catch (err) { pin.classList.add('nogl'); renderer = null; }
+
+  var rig, mac, hinge, pods, camera, scene3, dust, layout = {};
+  var macReady = false, tIntro = Infinity, setOpen = null;
+  function markReady(){
+    if (macReady) return;
+    macReady = true; tIntro = performance.now();
+    var l = document.getElementById('loading'); if (l) l.hidden = true;
+  }
+  var tx = 0, ty = 0, cx = 0, cy = 0;
+  if (renderer) {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    scene3 = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(0, 1.4, 10.5);
+    camera.lookAt(0, -0.2, 0);
+
+    /* studio reflections so the metal looks like metal */
+    try {
+      var pm = new THREE.PMREMGenerator(renderer);
+      var envS = new THREE.Scene();
+      envS.add(new THREE.Mesh(new THREE.BoxGeometry(30, 20, 30), new THREE.MeshBasicMaterial({ color: 0x1a2236, side: THREE.BackSide })));
+      var panel = function(w, h, x, y, z, k, col){
+        var p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
+        p.position.set(x, y, z); p.lookAt(0, 0, 0); envS.add(p);
+      };
+      panel(14, 6, 0, 9, 0, 6, 0xffffff);
+      panel(6, 10, -10, 2, 6, 4, 0xaecbff);
+      panel(6, 10, 10, 0, 4, 3, 0xffd9b0);
+      panel(10, 4, 0, -2, 12, 2, 0xffffff);
+      scene3.environment = pm.fromScene(envS, 0.04).texture;
+      pm.dispose();
+    } catch (e) {}
+
+    scene3.add(new THREE.AmbientLight(0xffffff, 0.4));
+    var sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(3, 5, 6); scene3.add(sun);
+    var rim = new THREE.DirectionalLight(0x9cc9ff, 0.8); rim.position.set(-4, 3, -5); scene3.add(rim);
+    var blue = new THREE.PointLight(0x6fb7ff, 1.0, 30); blue.position.set(-5, 2, 4); scene3.add(blue);
+    var warm = new THREE.PointLight(0xffb86b, 0.8, 30); warm.position.set(5, -2, 5); scene3.add(warm);
+
+    /* helpers */
+    var rrShape = function(w, h, r){
+      var s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.absarc(x + w - r, y + r, r, -Math.PI / 2, 0, false);
+      s.lineTo(x + w, y + h - r); s.absarc(x + w - r, y + h - r, r, 0, Math.PI / 2, false);
+      s.lineTo(x + r, y + h); s.absarc(x + r, y + h - r, r, Math.PI / 2, Math.PI, false);
+      s.lineTo(x, y + r); s.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5, false);
+      return s;
+    };
+    var rrPlane = function(w, h, r){
+      var g = new THREE.ShapeGeometry(rrShape(w, h, r), 12), p = g.attributes.position, uv = g.attributes.uv;
+      for (var i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / w + 0.5, p.getY(i) / h + 0.5);
+      return g;
+    };
+    var slab = function(w, d, h, r, bev){
+      var W = w - 2 * bev, D = d - 2 * bev, R = Math.max(0.001, r - bev);
+      var g = new THREE.ExtrudeGeometry(rrShape(W, D, R), { depth: h - 2 * bev, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 4, curveSegments: 12 });
+      g.translate(0, 0, -(h - 2 * bev) / 2);
+      g.rotateX(-Math.PI / 2);
+      return g;
+    };
+    var drawScreen = function(g, w, h){
+      var gr = g.createLinearGradient(0, 0, w, h);
+      gr.addColorStop(0, '#1a3b8f'); gr.addColorStop(.55, '#5b3fc4'); gr.addColorStop(1, '#ff8a5b');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.arc(w * .82, h * .2, h * .32, 0, 7); g.fill();
+      g.fillStyle = '#fff'; g.textBaseline = 'middle';
+      g.font = '700 150px "Unbounded", "Onest", system-ui, sans-serif';
+      g.fillText('Папа,', 96, h * .34);
+      g.font = '700 112px "Unbounded", "Onest", system-ui, sans-serif';
+      g.fillText('пожалуйста?', 96, h * .58);
+      g.font = '500 44px "Onest", system-ui, sans-serif';
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillText('Режим домашки: включён', 100, h * .82);
+    };
+    var drawKeys = function(g, w, h){
+      g.fillStyle = '#0d1018'; g.fillRect(0, 0, w, h);
+      var rows = 5, cols = 14, pad = 14, gap = 6;
+      var kw = (w - pad * 2 - gap * (cols - 1)) / cols, kh = (h - pad * 2 - gap * (rows - 1)) / rows;
+      g.fillStyle = '#272c3a';
+      for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) g.fillRect(pad + c * (kw + gap), pad + r * (kh + gap), kw, kh);
+    };
+    var mkTex = function(w, h, draw){
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+      draw(c.getContext('2d'), w, h); t.needsUpdate = true; t.userData = { c: c }; return t;
+    };
+    var screenTex = mkTex(1536, 1000, drawScreen), keyTex = mkTex(1024, 400, drawKeys);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
+      drawScreen(screenTex.userData.c.getContext('2d'), 1536, 1000); screenTex.needsUpdate = true;
+    });
+    var po = function(mat, f){ mat.polygonOffset = true; mat.polygonOffsetFactor = f; mat.polygonOffsetUnits = f; return mat; };
+
+    /* MacBook */
+    var alu = new THREE.MeshStandardMaterial({ color: 0xcfd4de, metalness: 0.9, roughness: 0.32 });
+    mac = new THREE.Group();
+    mac.add(new THREE.Mesh(slab(3.4, 2.3, 0.12, 0.16, 0.03), alu));
+    var kb = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 1.17), new THREE.MeshStandardMaterial({ map: keyTex, roughness: 0.85, metalness: 0 }));
+    kb.rotation.x = -Math.PI / 2; kb.position.set(0, 0.062, -0.3); mac.add(kb);
+    var tpG = rrPlane(1.2, 0.76, 0.07); tpG.rotateX(-Math.PI / 2);
+    var tp = new THREE.Mesh(tpG, new THREE.MeshStandardMaterial({ color: 0xb9bfcc, metalness: 0.7, roughness: 0.4 }));
+    tp.position.set(0, 0.063, 0.72); mac.add(tp);
+    hinge = new THREE.Group(); hinge.position.set(0, 0.06, -1.12); hinge.rotation.x = Math.PI / 2; mac.add(hinge);
+    var lidG = slab(3.4, 2.2, 0.07, 0.14, 0.02); lidG.rotateX(Math.PI / 2);
+    var lid = new THREE.Mesh(lidG, alu); lid.position.set(0, 1.1, -0.04); hinge.add(lid);
+    var bezel = new THREE.Mesh(rrPlane(3.3, 2.1, 0.1), po(new THREE.MeshBasicMaterial({ color: 0x05070b }), -1)); bezel.position.set(0, 1.1, -0.0035); hinge.add(bezel);
+    var scr = new THREE.Mesh(rrPlane(3.12, 1.95, 0.06), po(new THREE.MeshBasicMaterial({ map: screenTex }), -2)); scr.position.set(0, 1.1, -0.0025); hinge.add(scr);
+    var notch = new THREE.Mesh(rrPlane(0.5, 0.075, 0.035), po(new THREE.MeshBasicMaterial({ color: 0x05070b }), -3)); notch.position.set(0, 2.04, -0.0015); hinge.add(notch);
+
+    /* real MacBook model (CC BY 4.0, jackbaeten) replaces the simple one when it loads */
+    var procKids = mac.children.slice();
+    setOpen = function(v){ hinge.rotation.x = lerp(Math.PI / 2, -0.3, v); };
+    var useReal = function(gltf){
+      var root = gltf.scene, lidNodes = [], screenMats = [], box = new THREE.Box3(), c = new THREE.Vector3();
+      root.updateMatrixWorld(true);
+      root.traverse(function(o){
+        if (!o.isMesh) return;
+        box.setFromObject(o); box.getCenter(c);
+        if (c.z < -12.5 && c.y > 2.5) lidNodes.push(o);
+        if (o.material && o.material.emissiveMap && screenMats.indexOf(o.material) < 0) screenMats.push(o.material);
+      });
+      var pivot = new THREE.Group(); pivot.position.set(0, 0, -12.4); root.add(pivot); pivot.updateMatrixWorld(true);
+      lidNodes.forEach(function(o){ pivot.attach(o); });
+
+      var sc = document.createElement('canvas'); sc.width = 1600; sc.height = 1034;
+      var paint = function(){
+        var g = sc.getContext('2d'); g.save(); g.scale(1.5625, 1.5625); drawScreen(g, 1024, 661.8); g.restore();
+      };
+      paint();
+      var sTex = new THREE.CanvasTexture(sc); sTex.flipY = false; sTex.encoding = THREE.sRGBEncoding; sTex.anisotropy = 8;
+      screenMats.forEach(function(m){ m.emissiveMap = sTex; m.emissive.set(0xffffff); m.emissiveIntensity = 1; m.needsUpdate = true; });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ paint(); sTex.needsUpdate = true; });
+
+      var holder = new THREE.Group(); holder.scale.setScalar(0.0958); holder.position.set(0, 0.085, 0); holder.add(root);
+      mac.add(holder);
+      procKids.forEach(function(k){ k.visible = false; });
+      var CLOSE = Math.PI * 112 / 180, LIFT = 0.9;
+      setOpen = function(v){ pivot.rotation.x = (1 - v) * CLOSE; pivot.position.y = LIFT * (1 - v); };
+    };
+    (function(){
+      var giveUp = setTimeout(markReady, 12000);
+      var fail = function(){ clearTimeout(giveUp); markReady(); };
+      if (!THREE.GLTFLoader) { fail(); return; }
+      fetch('macbook.glb').then(function(r){ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(function(buf){
+          new THREE.GLTFLoader().parse(buf, '', function(gltf){
+            try { useReal(gltf); } catch (e) { if (window.console) console.error(e); }
+            clearTimeout(giveUp); markReady();
+          }, fail);
+        }).catch(fail);
+    })();
+
+    /* AirPods Max */
+    var steel = new THREE.MeshStandardMaterial({ color: 0xe3e7ee, metalness: 0.9, roughness: 0.25 });
+    var cupMat = new THREE.MeshStandardMaterial({ color: 0x9ec0e2, metalness: 0.8, roughness: 0.33 });
+    var fabric = new THREE.MeshStandardMaterial({ color: 0x1c2029, roughness: 1, metalness: 0 });
+    pods = new THREE.Group();
+    var band = new THREE.Mesh(new THREE.TorusGeometry(1.13, 0.04, 16, 72, Math.PI), steel); band.scale.z = 0.7; pods.add(band);
+    var net = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.1, 12, 72, Math.PI), fabric); net.scale.z = 0.9; pods.add(net);
+    var oval = function(g){ g.scale(1, 1.18, 0.92); return g; };
+    [-1, 1].forEach(function(sd){
+      var arm = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.55, 14), steel); arm.position.set(sd * 1.12, -0.25, 0); pods.add(arm);
+      var yoke = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.14, 14), steel); yoke.position.set(sd * 1.12, -0.5, 0); pods.add(yoke);
+      var cupG = new THREE.CylinderGeometry(0.6, 0.6, 0.36, 64); cupG.rotateZ(Math.PI / 2);
+      var cup = new THREE.Mesh(oval(cupG), cupMat); cup.position.set(sd * 1.2, -0.95, 0); pods.add(cup);
+      var capG = new THREE.CylinderGeometry(0.47, 0.47, 0.03, 48); capG.rotateZ(Math.PI / 2);
+      var cap = new THREE.Mesh(oval(capG), steel); cap.position.set(sd * 1.4, -0.95, 0); pods.add(cap);
+      var padG = new THREE.TorusGeometry(0.5, 0.17, 16, 48); padG.rotateY(Math.PI / 2);
+      var pad = new THREE.Mesh(oval(padG), fabric); pad.position.set(sd * 0.96, -0.95, 0); pods.add(pad);
+    });
+    var crown = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.2, 18), steel); crown.position.set(1.28, -0.2, -0.18); pods.add(crown);
+    var btn = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.08, 0.2), steel); btn.position.set(1.12, -0.2, 0.22); pods.add(btn);
+
+    /* real AirPods Max model (CC BY-NC 4.0, Bernardo Ferreira Baptista) swaps in when it loads */
+    var podKids = pods.children.slice();
+    (function(){
+      if (!THREE.GLTFLoader) return;
+      fetch('airpods.glb').then(function(r){ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(function(buf){
+          new THREE.GLTFLoader().parse(buf, '', function(gltf){
+            try {
+              var holder = new THREE.Group(); holder.position.set(0, -0.3, 0); holder.add(gltf.scene);
+              gltf.scene.traverse(function(o){
+                if (o.isMesh && o.material) { o.material.side = THREE.DoubleSide; o.material.envMapIntensity = 1.1; }
+              });
+              pods.add(holder);
+              podKids.forEach(function(k){ k.visible = false; });
+            } catch (e) { if (window.console) console.error(e); }
+          }, function(){});
+        }).catch(function(){});
+    })();
+
+    rig = new THREE.Group(); rig.add(mac); rig.add(pods); scene3.add(rig);
+
+    var N = 150, p3 = new Float32Array(N * 3);
+    for (var i = 0; i < N; i++) {
+      var an = Math.random() * 6.283, rr = 5 + Math.random() * 5;
+      p3[i * 3] = Math.cos(an) * rr; p3[i * 3 + 1] = (Math.random() - .5) * 9; p3[i * 3 + 2] = Math.sin(an) * rr - 3;
+    }
+    var pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.Float32BufferAttribute(p3, 3));
+    dust = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x9cc9ff, size: 0.06, transparent: true, opacity: 0.7 }));
+    scene3.add(dust);
+
+    var SLOTS = {
+      desk: { macC: { x: -1.95, y: -1.0, s: 0.85 }, podC: { x: 2.5, y: -0.2, s: 1.05 }, podB: 1.7, a0: 1.0, a1: 1.3 },
+      mob:  { macC: { x: -1.15, y: -0.9, s: 0.5 }, podC: { x: 1.3, y: -0.1, s: 0.8 }, podB: 1.15, a0: 0.95, a1: 1.1 }
+    };
+    var resize = function(){
+      var W = pin.clientWidth, H = pin.clientHeight; if (!W || !H) return;
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H; camera.updateProjectionMatrix();
+      var visH = 2 * 10.5 * Math.tan(19 * Math.PI / 180), visW = visH * camera.aspect;
+      var mobile = camera.aspect < 1.15;
+      layout.slots = mobile ? SLOTS.mob : SLOTS.desk;
+      if (mobile) { rig.scale.setScalar(Math.min(1, visW * 0.95 / 4.8)); rig.position.set(0, visH * 0.17, 0); }
+      else { rig.scale.setScalar(Math.min(1.1, visW * 0.54 / 7.3)); rig.position.set(visW * 0.2, 0, 0); }
+    };
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(pin); else window.addEventListener('resize', resize);
+    resize();
+
+    pin.addEventListener('pointermove', function(e){
+      var r = pin.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width - .5) * 2; ty = ((e.clientY - r.top) / r.height - .5) * 2;
+    });
+    pin.addEventListener('pointerleave', function(){ tx = 0; ty = 0; });
+  }
+
+  /* ================= gaming PC viewer (CC BY 4.0, Yolala1232) ================= */
+  (function(){
+    var box = document.getElementById('pcStage'), cvp = document.getElementById('glPc'), note = document.getElementById('pcNote');
+    var fail = function(msg){ if (note) { note.hidden = false; note.textContent = msg; } };
+    if (!box || !cvp) return;
+    if (!window.THREE || !THREE.GLTFLoader) { fail('Не удалось запустить 3D.'); return; }
+    var rd;
+    try { rd = new THREE.WebGLRenderer({ canvas: cvp, antialias: true, alpha: true }); } catch (e) { fail('Не удалось запустить 3D.'); return; }
+    rd.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    rd.outputEncoding = THREE.sRGBEncoding;
+    var sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    cam.position.set(0, 1.2, 11.5); cam.lookAt(0, 0, 0);
+    try {
+      var pm = new THREE.PMREMGenerator(rd), envS = new THREE.Scene();
+      envS.add(new THREE.Mesh(new THREE.BoxGeometry(30, 20, 30), new THREE.MeshBasicMaterial({ color: 0x1a2236, side: THREE.BackSide })));
+      var pan = function(w, h, x, y, z, k, col){
+        var p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
+        p.position.set(x, y, z); p.lookAt(0, 0, 0); envS.add(p);
+      };
+      pan(14, 6, 0, 9, 0, 6, 0xffffff); pan(6, 10, -10, 2, 6, 4, 0xaecbff); pan(6, 10, 10, 0, 4, 3, 0xffd9b0); pan(10, 4, 0, -2, 12, 2, 0xffffff);
+      sc.environment = pm.fromScene(envS, 0.04).texture; pm.dispose();
+    } catch (e) {}
+    sc.add(new THREE.AmbientLight(0xffffff, 0.45));
+    var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(3, 5, 6); sc.add(key);
+    var rimL = new THREE.DirectionalLight(0x9cc9ff, 0.8); rimL.position.set(-4, 3, -5); sc.add(rimL);
+    var holder = new THREE.Group(); holder.scale.setScalar(1.1); sc.add(holder);
+    var spin = new THREE.Group(); holder.add(spin);
+
+    var size = function(){
+      var w = box.clientWidth, h = box.clientHeight; if (!w || !h) return;
+      rd.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+      holder.scale.setScalar(w / h < 1 ? 0.8 : 1.1);
+    };
+    if (window.ResizeObserver) new ResizeObserver(size).observe(box); else window.addEventListener('resize', size);
+    size();
+
+    var yaw = Math.PI / 2 + 0.5, pitch = 0.12, dragging = false, lx = 0, ly = 0, loaded = false, started = false;
+    cvp.addEventListener('pointerdown', function(e){ dragging = true; lx = e.clientX; ly = e.clientY; try { cvp.setPointerCapture(e.pointerId); } catch (x) {} });
+    cvp.addEventListener('pointermove', function(e){
+      if (!dragging) return;
+      yaw += (e.clientX - lx) * 0.01; pitch = Math.max(-0.35, Math.min(0.6, pitch + (e.clientY - ly) * 0.004)); lx = e.clientX; ly = e.clientY;
+    });
+    var up = function(){ dragging = false; };
+    cvp.addEventListener('pointerup', up); cvp.addEventListener('pointercancel', up);
+
+    var load = function(){
+      if (started) return; started = true;
+      fetch('gamingpc.glb').then(function(r){ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(function(buf){
+          new THREE.GLTFLoader().parse(buf, '', function(gltf){
+            gltf.scene.traverse(function(o){ if (o.isMesh && o.material) o.material.envMapIntensity = 1.0; });
+            spin.add(gltf.scene); loaded = true; if (note) note.hidden = true;
+          }, function(){ fail('Не удалось загрузить модель.'); });
+        }).catch(function(){ fail('Не удалось загрузить модель.'); });
+    };
+    if (reduce) { yaw = Math.PI / 2 + 0.5; }
+    (function tick(){
+      requestAnimationFrame(tick);
+      var r = box.getBoundingClientRect();
+      if (r.top < innerHeight + 900 && r.bottom > -900) load();
+      if (!loaded || r.bottom < 0 || r.top > innerHeight || document.hidden) return;
+      if (!dragging && !reduce) yaw += 0.004;
+      spin.rotation.y = yaw; spin.rotation.x = pitch;
+      rd.render(sc, cam);
+    })();
+  })();
+
+  var t0 = performance.now();
+  var introDone = reduce || window.scrollY > 60;
+  var sceneVisible = true;
+  if (window.IntersectionObserver) new IntersectionObserver(function(en){ sceneVisible = en[0].isIntersecting; }, { rootMargin: '100px' }).observe(scene);
+  var sm = sceneProgress();
+
+  function updateScene(now, s){
+    var t = (now - t0) / 1000;
+    var it = introDone ? 1 : clamp01((now - tIntro - 250) / 2800);
+    var ie = eo(it), lo = ss(range(it, 0.3, 1));
+    var idle = reduce ? 0 : 1;
+    var L = layout.slots; if (!L) return;
+
+    setOpen(lo);
+
+    var k1 = ss(range(s, 0.28, 0.42)), k2 = ss(range(s, 0.72, 0.88)), a = ss(range(s, 0, 0.28));
+    var C = L.macC;
+    var mx = (s < 0.72 ? lerp(0, -14, k1) : lerp(-14, C.x, k2)) + (1 - ie) * 9;
+    var my = lerp(-1.1, C.y, k2) + Math.sin(t * 0.9) * 0.05 * idle;
+    var msc = s < 0.72 ? lerp(L.a0, L.a1, a) : lerp(L.a1, C.s, k2);
+    var mry = s < 0.28 ? lerp(0.5, -0.3, a) : s < 0.72 ? -0.3 - 1.2 * k1 : lerp(-1.5, 0.35, k2);
+    mac.position.set(mx, my, 0);
+    mac.scale.setScalar(msc);
+    mac.rotation.y = mry - (1 - ie) * 0.9 + cx * 0.25;
+    mac.rotation.x = cy * 0.06;
+    mac.visible = macReady && mx > -15;
+
+    var P = L.podC, pe = eo(range(s, 0.28, 0.44));
+    var px = s < 0.72 ? lerp(14, 0, pe) : lerp(0, P.x, k2);
+    var py = (s < 0.72 ? lerp(2.5, 0, pe) : lerp(0, P.y, k2)) + Math.sin(t * 1.2) * 0.1 * idle;
+    var psc = s < 0.72 ? lerp(L.podB * 0.8, L.podB, ss(range(s, 0.28, 0.72))) : lerp(L.podB, P.s, k2);
+    pods.position.set(px, py, 1);
+    pods.scale.setScalar(psc);
+    pods.rotation.y = s * 9 + t * 0.5 * idle + cx * 0.3;
+    pods.rotation.x = 0.1 + cy * 0.08;
+    pods.rotation.z = (1 - pe) * 0.8;
+    pods.visible = px < 15;
+
+    dust.rotation.y = t * 0.03 * idle + s * 0.8;
+    camera.position.x = cx * 0.6;
+    camera.lookAt(0, -0.2, 0);
+    renderer.render(scene3, camera);
+  }
+
+  function loop(now){
+    requestAnimationFrame(loop);
+    var s = sceneProgress();
+    sm += (s - sm) * (reduce ? 1 : 0.14);
+    if (Math.abs(s - sm) < 0.0004) sm = s;
+    if (!introDone && now - tIntro > 3100) introDone = true;
+    cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
+    updateCopy(sm, introDone || now - tIntro > 2400);
+    var docH = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = 'scaleX(' + (docH > 0 ? clamp01(window.scrollY / docH) : 0).toFixed(4) + ')';
+    if (renderer && sceneVisible && !document.hidden) updateScene(now, sm);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
